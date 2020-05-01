@@ -6,7 +6,7 @@ let package = Package(
     name: "lyricsx-cli",
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.0.1")),
-        .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.8.2")),
+        .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.8.3")),
         .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.2.2")),
     ],
     targets: [
