@@ -4,6 +4,8 @@
 
 [LyricsX](https://github.com/ddddxxx/LyricsX) cross platform command line interface.
 
+This project is a proof of concept to demonstrate building [LyricsKit](https://github.com/ddddxxx/LyricsKit) on linux. No actual functionality is implemented yet.
+
 ## Usage
 
 ```
