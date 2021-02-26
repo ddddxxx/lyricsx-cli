@@ -2,7 +2,7 @@ import ArgumentParser
 import LyricsService
 import CXExtensions
 
-enum LyricsFormat: String, CaseIterable {
+enum LyricsFormat: String, EnumerableFlag {
     case lrcx
     case lrc
 }
@@ -11,14 +11,14 @@ struct LyricsSearch: ParsableCommand {
     
     static var configuration = CommandConfiguration(commandName: "search", abstract: "search lyrics from the internet")
     
-    @Argument()
+    @Argument
     var keyword: String
     
-    @Flag(default: .lrcx)
-    var format: LyricsFormat
+    @Flag
+    var format: LyricsFormat = .lrcx
     
     func run() throws {
-        let provider = LyricsProviderManager()
+        let provider = LyricsProviders.Group()
         let req = LyricsSearchRequest(searchTerm: .keyword(keyword), title: "", artist: "", duration: 0)
         guard let lrc = provider.lyricsPublisher(request: req).blocking().next() else {
             print("lyrics not found")

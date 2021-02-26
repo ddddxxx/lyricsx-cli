@@ -1,7 +1,7 @@
 import XCTest
 import class Foundation.Bundle
 
-final class lyricsx_cliTests: XCTestCase {
+final class LyricsXCLITests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
@@ -40,8 +40,4 @@ final class lyricsx_cliTests: XCTestCase {
         return Bundle.main.bundleURL
       #endif
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

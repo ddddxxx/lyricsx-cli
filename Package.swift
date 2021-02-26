@@ -1,20 +1,27 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 
 import PackageDescription
 
 let package = Package(
     name: "lyricsx-cli",
+    products: [
+        .executable(name: "lyricsx-cli", targets: ["lyricsx-cli"]),
+    ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.0.1")),
-        .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.8.3")),
-        .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.2.2")),
+        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
+        .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.9.1")),
+        .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.3.0")),
     ],
     targets: [
         .target(
             name: "lyricsx-cli",
-            dependencies: ["ArgumentParser", "LyricsKit", "CXExtensions"]),
+            dependencies: [
+                "LyricsKit",
+                "CXExtensions",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ]),
         .testTarget(
-            name: "lyricsx-cliTests",
+            name: "lyricsx-cli-tests",
             dependencies: ["lyricsx-cli"]),
     ]
 )
