@@ -6,8 +6,27 @@
 
 This project is a proof of concept to demonstrate building [LyricsKit](https://github.com/ddddxxx/LyricsKit) on linux. No actual functionality is implemented yet.
 
+## Dependences
+
+### Linux
+
+[playerctl](https://github.com/altdesktop/playerctl)
+
+Can be installed by package manager.
+
+### macOS
+
+\-
+
 ## Usage
 
+
+- Search
 ```
 $ lyricsx-cli search <keyword>
+```
+
+- Tick
+```
+$ lyricsx-cli tick
 ```

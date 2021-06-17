@@ -2,6 +2,31 @@
 
 import PackageDescription
 
+var targetDependences: [Target.Dependency] = [
+    "LyricsKit",
+    "CXExtensions",
+    .product(name: "ArgumentParser", package: "swift-argument-parser"),
+]
+
+#if os(macOS)
+targetDependences.append("MusicPlayer")
+#elseif os(Linux)
+targetDependences.append("playerctl")
+#endif
+
+var targets: [Target] = [
+    .target(
+        name: "lyricsx-cli",
+        dependencies: targetDependences),
+    .testTarget(
+        name: "lyricsx-cli-tests",
+        dependencies: ["lyricsx-cli"]),
+]
+
+#if os(Linux)
+targets.append(.systemLibrary(name: "playerctl", pkgConfig: "playerctl"))
+#endif
+
 let package = Package(
     name: "lyricsx-cli",
     products: [
@@ -11,19 +36,9 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
         .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.9.1")),
         .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.3.0")),
+        .package(url: "https://github.com/ddddxxx/MusicPlayer", .upToNextMinor(from: "0.7.1")),
     ],
-    targets: [
-        .target(
-            name: "lyricsx-cli",
-            dependencies: [
-                "LyricsKit",
-                "CXExtensions",
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-            ]),
-        .testTarget(
-            name: "lyricsx-cli-tests",
-            dependencies: ["lyricsx-cli"]),
-    ]
+    targets: targets
 )
 
 enum CombineImplementation {

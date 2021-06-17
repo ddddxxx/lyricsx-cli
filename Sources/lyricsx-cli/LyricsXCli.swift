@@ -27,3 +27,24 @@ struct LyricsSearch: ParsableCommand {
         print(format == .lrcx ? lrc.description : lrc.legacyDescription)
     }
 }
+
+struct LyricsTick: ParsableCommand {
+    
+    static var configuration = CommandConfiguration(commandName: "tick",
+                                                    abstract: "tick lyrics to stdout from the internet, with playing music")
+    
+    func run() throws {
+        let ticker = LyricTicker { line in
+            print(line.content)
+        }
+        ticker.run()
+    }
+}
+
+
+struct LyricsX: ParsableCommand {
+    
+    static var configuration = CommandConfiguration(commandName: "lyricsx-cli",
+                                                    abstract: "LyricsX command line interface",
+                                                    subcommands: [LyricsSearch.self, LyricsTick.self])
+}
