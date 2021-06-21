@@ -1,6 +1,8 @@
+import Foundation
 import ArgumentParser
 import LyricsService
 import CXExtensions
+import MusicPlayer
 
 enum LyricsFormat: String, EnumerableFlag {
     case lrcx
@@ -34,10 +36,12 @@ struct LyricsTick: ParsableCommand {
                                                     abstract: "tick lyrics to stdout from the internet, with playing music")
     
     func run() throws {
-        let ticker = LyricTicker { line in
+        let ticker = LyricTicker(player: MusicPlayers.SystemMedia()!) { line in
             print(line.content)
         }
-        ticker.run()
+        ticker.start()
+        
+        RunLoop.main.run()
     }
 }
 

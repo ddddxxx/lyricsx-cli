@@ -39,11 +39,11 @@
       },
       {
         "package": "MusicPlayer",
-        "repositoryURL": "https://github.com/ddddxxx/MusicPlayer",
+        "repositoryURL": "https://github.com/suransea/MusicPlayer",
         "state": {
-          "branch": null,
-          "revision": "34d5e23c5e1b4932124c83dd58d2be590fcf2b9f",
-          "version": "0.7.3"
+          "branch": "master",
+          "revision": "4cc0b9f34216ffe893911acb6648b51676d4e701",
+          "version": null
         }
       },
       {
