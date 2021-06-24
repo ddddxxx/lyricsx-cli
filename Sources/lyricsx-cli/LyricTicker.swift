@@ -14,11 +14,9 @@ class LyricTicker {
     
     var lines: [LyricsLine] = []
     var index = 0
-    var track: MusicTrack?
     
     let queue = DispatchQueue(label: "LyricTicker\(LyricTicker.id)").cx
     var scheduledTick: DispatchWorkItem?
-    var scheduledCheck: DispatchWorkItem?
     var cancelBag: [AnyCancellable] = []
     
     init(player: MusicPlayerProtocol, onLine: @escaping (LyricsLine) -> Void) {
@@ -31,74 +29,75 @@ class LyricTicker {
     }
     
     func start() {
-        checkTrack()
-        scheduleCheck()
+        player.currentTrackWillChange
+            .receive(on: queue)
+            .sink(receiveValue: updateTrack)
+            .store(in: &cancelBag)
+        player.playbackStateWillChange
+            .throttle(for: 1, scheduler: queue, latest: true)
+            .receive(on: queue)
+            .sink(receiveValue: updateStatus)
+            .store(in: &cancelBag)
     }
     
     func stop() {
         cancelBag.forEach { $0.cancel() }
         cancelBag = []
-        cancel(&scheduledTick)
-        cancel(&scheduledCheck)
-    }
-    
-    private func cancel(_ item: inout DispatchWorkItem?) {
-        item?.cancel()
-        item = nil
+        cancelScheduledTick()
     }
     
     private func updateTrack(track: MusicTrack?) {
-        cancel(&scheduledTick)
-        self.track = track
-        
+        cancelScheduledTick()
         guard let track = track else {
             return
         }
         let (title, artist, album) = (track.title ?? "", track.artist ?? "", track.album ?? "")
         print("\nPlaying:")
         print("Title: \(title)\nArtist: \(artist)\nAlbum: \(album)\n")
+        
         lyricOf(title: title, artist: artist)
             .receive(on: queue)
-            .sink { lyric in
-                guard let lrc = lyric else {
+            .sink { lrc in
+                guard let lrc = lrc else {
                     print("No lyrics found.")
                     return
                 }
                 print("Matched:")
                 print("Source: \(lrc.metadata.service?.rawValue ?? "")\n")
                 self.lines = lrc.lines
-                self.tick(tickPast: true)
+                self.tick(tickPast: true, tickNext: self.player.playbackState.isPlaying)
             }
             .store(in: &cancelBag)
     }
     
-    private func updatePosition() {
-        cancel(&scheduledTick)
-        tick(tickPast: false)
+    private func updateStatus(status: PlaybackState) {
+        cancelScheduledTick()
+        if status.isPlaying {
+            tick(tickPast: false)
+        }
     }
     
-    private func tick(tickPast: Bool = true) {
+    private func cancelScheduledTick() {
+        if let item = scheduledTick {
+            item.cancel()
+            scheduledTick = nil
+        }
+    }
+    
+    private func tick(tickPast: Bool = true, tickNext: Bool = true) {
         guard let index = index(of: player.playbackTime) else {
-            for line in lines {
-                onLine(line)
-            }
+            lines.forEach(onLine)
             return
         }
         if tickPast {
-            lines.prefix(index).forEach { line in
-                onLine(line)
-            }
+            lines.prefix(index).forEach(onLine)
         } else if index > 0 {
             onLine(lines[index - 1])
         }
         self.index = index
-        scheduleTick()
-    }
-    
-    private func schedule(after timeInterval: TimeInterval, action: @escaping () -> Void) -> DispatchWorkItem {
-        let item = DispatchWorkItem(block: action)
-        queue.base.asyncAfter(deadline: .now() + timeInterval, execute: item)
-        return item
+        if tickNext {
+            scheduleTick()
+        }
     }
     
     private func scheduleTick() {
@@ -106,44 +105,13 @@ class LyricTicker {
             return
         }
         let line = lines[index]
-        scheduledTick = schedule(after: line.position - player.playbackTime) {
+        let work = DispatchWorkItem {
             self.onLine(line)
             self.index += 1
             self.scheduleTick()
         }
-    }
-    
-    private func scheduleCheck() {
-        scheduledCheck = schedule(after: 1) {
-            self.checkTrack()
-            self.scheduleCheck()
-        }
-    }
-    
-    private func checkTrack() {
-        let track = player.playbackState.isPlaying ? player.currentTrack : nil
-        if self.track?.id != track?.id {
-            updateTrack(track: track)
-            return
-        }
-        if track == nil {
-            return
-        }
-        let pos = player.playbackTime
-        if index > 0 && index <= lines.count {
-            let prev = lines[index - 1]
-            if pos < prev.position {
-                updatePosition()
-                return
-            }
-        }
-        if index == lines.count {
-            return
-        }
-        let line = lines[index]
-        if pos > line.position {
-            updatePosition()
-        }
+        queue.base.asyncAfter(deadline: .now() + (line.position - player.playbackTime), execute: work)
+        scheduledTick = work
     }
     
     private func index(of offset: TimeInterval) -> Int? {
