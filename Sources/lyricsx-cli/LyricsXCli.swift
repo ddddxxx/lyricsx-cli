@@ -30,21 +30,30 @@ struct LyricsSearch: ParsableCommand {
     }
 }
 
+#if os(macOS)
+typealias PlayingPlayer = MusicPlayers.SystemMedia
+#elseif os(Linux)
+typealias PlayingPlayer = MusicPlayers.MPRISNowPlaying
+#endif
+
 struct LyricsTick: ParsableCommand {
     
     static var configuration = CommandConfiguration(commandName: "tick",
                                                     abstract: "tick lyrics to stdout from the internet, with playing music")
     
     func run() throws {
-        let ticker = LyricTicker(player: MusicPlayers.SystemMedia()!) { line in
+        let ticker = LyricTicker(player: PlayingPlayer()!) { line in
             print(line.content)
         }
         ticker.start()
         
+        #if os(Linux)
+        GRunLoop.main.run()
+        #else
         RunLoop.main.run()
+        #endif
     }
 }
-
 
 struct LyricsX: ParsableCommand {
     
