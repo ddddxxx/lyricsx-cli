@@ -101,7 +101,7 @@ class LyricTicker {
     }
     
     private func scheduleTick() {
-        if index == lines.count {
+        if index >= lines.count {
             return
         }
         let line = lines[index]
