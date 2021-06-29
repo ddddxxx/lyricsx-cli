@@ -16,8 +16,9 @@ class LyricTicker {
     var index = 0
     
     let queue = DispatchQueue(label: "LyricTicker\(LyricTicker.id)").cx
-    var scheduledTick: DispatchWorkItem?
-    var cancelBag: [AnyCancellable] = []
+    var eventCancelBag: [AnyCancellable] = []
+    var tickCancelBag: [AnyCancellable] = []
+    var ignoreStatus = false
     
     init(player: MusicPlayerProtocol, onLine: @escaping (LyricsLine) -> Void) {
         self.player = player
@@ -32,22 +33,23 @@ class LyricTicker {
         player.currentTrackWillChange
             .receive(on: queue)
             .sink(receiveValue: updateTrack)
-            .store(in: &cancelBag)
+            .store(in: &eventCancelBag)
         player.playbackStateWillChange
-            .throttle(for: 1, scheduler: queue, latest: true)
+            .debounce(for: 1, scheduler: queue)
             .receive(on: queue)
             .sink(receiveValue: updateStatus)
-            .store(in: &cancelBag)
+            .store(in: &eventCancelBag)
     }
     
     func stop() {
-        cancelBag.forEach { $0.cancel() }
-        cancelBag = []
         cancelScheduledTick()
+        eventCancelBag.forEach { $0.cancel() }
+        eventCancelBag = []
     }
     
     private func updateTrack(track: MusicTrack?) {
         cancelScheduledTick()
+        ignoreStatus(for: 1.5)
         guard let track = track else {
             return
         }
@@ -67,21 +69,32 @@ class LyricTicker {
                 self.lines = lrc.lines
                 self.tick(tickPast: true, tickNext: self.player.playbackState.isPlaying)
             }
-            .store(in: &cancelBag)
+            .store(in: &tickCancelBag)
     }
     
     private func updateStatus(status: PlaybackState) {
+        if ignoreStatus {
+            return
+        }
         cancelScheduledTick()
         if status.isPlaying {
             tick(tickPast: false)
         }
     }
     
+    private func ignoreStatus(for time: TimeInterval) {
+        ignoreStatus = true
+        Just(())
+            .delay(for: .seconds(time), scheduler: queue)
+            .receive(on: queue)
+            .sink { self.ignoreStatus = false }
+            .store(in: &tickCancelBag)
+    }
+    
     private func cancelScheduledTick() {
-        if let item = scheduledTick {
-            item.cancel()
-            scheduledTick = nil
-        }
+        tickCancelBag.forEach { $0.cancel() }
+        tickCancelBag = []
+        ignoreStatus = false
     }
     
     private func tick(tickPast: Bool = true, tickNext: Bool = true) {
@@ -105,13 +118,15 @@ class LyricTicker {
             return
         }
         let line = lines[index]
-        let work = DispatchWorkItem {
-            self.onLine(line)
-            self.index += 1
-            self.scheduleTick()
-        }
-        queue.base.asyncAfter(deadline: .now() + (line.position - player.playbackTime), execute: work)
-        scheduledTick = work
+        Just(line)
+            .delay(for: .seconds(line.position - player.playbackTime), scheduler: queue)
+            .receive(on: queue)
+            .sink {
+                self.onLine($0)
+                self.index += 1
+                self.scheduleTick()
+            }
+            .store(in: &tickCancelBag)
     }
     
     private func index(of offset: TimeInterval) -> Int? {
@@ -123,7 +138,7 @@ class LyricTicker {
                                       title: title, artist: artist, duration: 0)
         return LyricsProviders.Group()
             .lyricsPublisher(request: req)
-            .collect(3)
+            .collect(2)
             .first()
             .map { $0.sorted { $1.quality < $0.quality }.first }
             .eraseToAnyPublisher()
