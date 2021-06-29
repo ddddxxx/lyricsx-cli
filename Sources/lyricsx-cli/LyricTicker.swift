@@ -35,7 +35,7 @@ class LyricTicker {
             .sink(receiveValue: updateTrack)
             .store(in: &eventCancelBag)
         player.playbackStateWillChange
-            .debounce(for: 1, scheduler: queue)
+            .debounce(for: 0.5, scheduler: queue)
             .receive(on: queue)
             .sink(receiveValue: updateStatus)
             .store(in: &eventCancelBag)
@@ -49,7 +49,7 @@ class LyricTicker {
     
     private func updateTrack(track: MusicTrack?) {
         cancelScheduledTick()
-        ignoreStatus(for: 1.5)
+        ignoreStatus = true
         guard let track = track else {
             return
         }
@@ -66,8 +66,10 @@ class LyricTicker {
                 }
                 print("Matched:")
                 print("Source: \(lrc.metadata.service?.rawValue ?? "")\n")
+                self.ignoreStatus = false
                 self.lines = lrc.lines
-                self.tick(tickPast: true, tickNext: self.player.playbackState.isPlaying)
+                self.index = 0
+                self.tick()
             }
             .store(in: &tickCancelBag)
     }
@@ -78,37 +80,27 @@ class LyricTicker {
         }
         cancelScheduledTick()
         if status.isPlaying {
-            tick(tickPast: false)
+            tick()
         }
-    }
-    
-    private func ignoreStatus(for time: TimeInterval) {
-        ignoreStatus = true
-        Just(())
-            .delay(for: .seconds(time), scheduler: queue)
-            .receive(on: queue)
-            .sink { self.ignoreStatus = false }
-            .store(in: &tickCancelBag)
     }
     
     private func cancelScheduledTick() {
         tickCancelBag.forEach { $0.cancel() }
         tickCancelBag = []
-        ignoreStatus = false
     }
     
-    private func tick(tickPast: Bool = true, tickNext: Bool = true) {
+    private func tick() {
         guard let index = index(of: player.playbackTime) else {
             lines.forEach(onLine)
             return
         }
-        if tickPast {
-            lines.prefix(index).forEach(onLine)
-        } else if index > 0 {
+        if index > self.index {
+            lines.prefix(index).dropFirst(self.index).forEach(onLine)
+        } else if index < self.index && index > 0 {
             onLine(lines[index - 1])
         }
         self.index = index
-        if tickNext {
+        if player.playbackState.isPlaying {
             scheduleTick()
         }
     }
