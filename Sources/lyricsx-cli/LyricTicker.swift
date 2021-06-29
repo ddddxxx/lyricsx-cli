@@ -59,19 +59,21 @@ class LyricTicker {
         
         lyricOf(title: title, artist: artist)
             .receive(on: queue)
-            .sink { lrc in
-                guard let lrc = lrc else {
-                    print("No lyrics found.")
-                    return
-                }
-                print("Matched:")
-                print("Source: \(lrc.metadata.service?.rawValue ?? "")\n")
-                self.ignoreStatus = false
-                self.lines = lrc.lines
-                self.index = 0
-                self.tick()
-            }
+            .sink(receiveValue: onReceiveLyric)
             .store(in: &tickCancelBag)
+    }
+    
+    private func onReceiveLyric(lrc: Lyrics?) {
+        guard let lrc = lrc else {
+            print("No lyrics found.")
+            return
+        }
+        print("Matched:")
+        print("Source: \(lrc.metadata.service?.rawValue ?? "")\n")
+        ignoreStatus = false
+        lines = lrc.lines
+        index = 0
+        tick()
     }
     
     private func updateStatus(status: PlaybackState) {
@@ -94,11 +96,7 @@ class LyricTicker {
             lines.forEach(onLine)
             return
         }
-        if index > self.index {
-            lines.prefix(index).dropFirst(self.index).forEach(onLine)
-        } else if index < self.index && index > 0 {
-            onLine(lines[index - 1])
-        }
+        lines.prefix(index).dropFirst(index < self.index ? 0 : self.index).forEach(onLine)
         self.index = index
         if player.playbackState.isPlaying {
             scheduleTick()
