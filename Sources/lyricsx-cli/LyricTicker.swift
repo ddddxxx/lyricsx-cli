@@ -74,7 +74,7 @@ class LyricTicker {
             onReceiveLyric(lyric: nil)
             return
         }
-        lyricOf(title: track.title ?? "", artist: track.artist ?? "")
+        lyricOf(title: track.title ?? "", artist: track.artist ?? "", duration: track.duration ?? 0)
             .receive(on: queue)
             .sink(receiveValue: onReceiveLyric)
             .store(in: &tickCancelBag)
@@ -131,9 +131,9 @@ class LyricTicker {
         (lines.firstIndex { $0.position > offset } ?? lines.count) - 1
     }
     
-    private func lyricOf(title: String, artist: String) -> AnyPublisher<Lyrics?, Never> {
+    private func lyricOf(title: String, artist: String, duration: TimeInterval) -> AnyPublisher<Lyrics?, Never> {
         let req = LyricsSearchRequest(searchTerm: .info(title: title, artist: artist),
-                                      title: title, artist: artist, duration: 0)
+                                      title: title, artist: artist, duration: duration)
         return LyricsProviders.Group()
             .lyricsPublisher(request: req)
             .collect(3)
