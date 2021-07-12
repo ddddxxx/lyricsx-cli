@@ -42,9 +42,21 @@ struct LyricsTick: ParsableCommand {
                                                     abstract: "tick lyrics to stdout from the internet, with playing music")
     
     func run() throws {
-        let ticker = LyricTicker(player: PlayingPlayer()!) { line in
-            print(line.content)
+        let ticker = LyricTicker(player: PlayingPlayer()!)
+        ticker.onTrack = { track in
+            guard let track = track else { return }
+            print("\nPlaying:")
+            print("Title: \(track.title ?? "")\nArtist: \(track.artist ?? "")\nAlbum: \(track.album ?? "")\n")
         }
+        ticker.onLyrics = { lyric in
+            guard let lrc = lyric else { return }
+            print("Matched:")
+            print("Source: \(lrc.metadata.service?.rawValue ?? "")\n")
+        }
+        ticker.onSeek = { [unowned ticker] old, new in
+            ticker.lines.prefix(new + 1).dropFirst(old < new && old > 0 ? old : 0).forEach { print($0.content) }
+        }
+        ticker.onLine = { print($0.content) }
         ticker.start()
         
         #if os(Linux)
@@ -52,6 +64,48 @@ struct LyricsTick: ParsableCommand {
         #else
         RunLoop.main.run()
         #endif
+        
+        ticker.stop()
+    }
+}
+
+import Termbox
+
+struct LyricsPlay: ParsableCommand {
+    
+    static var configuration = CommandConfiguration(commandName: "play",
+                                                    abstract: "play lyrics with playing music")
+    
+    func run() throws {
+        try Termbox.initialize()
+        #if os(Linux)
+        Thread.detachNewThread {
+            Thread.current.name = "GMainLoop"
+            GRunLoop.main.run()
+        }
+        #endif
+        
+        let player = LyricPlayer(player: PlayingPlayer()!)
+        player.start()
+        loop: while true {
+            guard let event = Termbox.pollEvent() else {
+                continue
+            }
+            switch event {
+            case .character(modifier: .none, value: "q"):
+                break loop
+            case .character(modifier: .none, value: "r"):
+                player.reloadLyric()
+                break
+            case .resize(width: _, height: _):
+                player.forceUpdate()
+                break
+            default:
+                break
+            }
+        }
+        player.stop()
+        Termbox.shutdown()
     }
 }
 
@@ -59,5 +113,5 @@ struct LyricsX: ParsableCommand {
     
     static var configuration = CommandConfiguration(commandName: "lyricsx-cli",
                                                     abstract: "LyricsX command line interface",
-                                                    subcommands: [LyricsSearch.self, LyricsTick.self])
+                                                    subcommands: [LyricsSearch.self, LyricsTick.self, LyricsPlay.self])
 }

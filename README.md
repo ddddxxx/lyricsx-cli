@@ -30,3 +30,10 @@ $ lyricsx-cli search <keyword>
 ```
 $ lyricsx-cli tick
 ```
+
+- Play
+```
+$ lyricsx-cli play
+```
+
+![play.png](https://i.loli.net/2021/07/12/4Zb36O5tANhoD8W.png)

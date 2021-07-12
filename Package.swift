@@ -12,6 +12,7 @@ let package = Package(
         .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.9.1")),
         .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.3.1")),
         .package(url: "https://github.com/suransea/MusicPlayer", .branch("master")),
+        .package(url: "https://github.com/suransea/Termbox", .branch("main")),
     ],
     targets:  [
         .target(
@@ -21,6 +22,7 @@ let package = Package(
                 "CXExtensions",
                 "MusicPlayer",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                "Termbox",
             ]),
         .testTarget(
             name: "lyricsx-cli-tests",

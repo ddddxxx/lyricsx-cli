@@ -42,7 +42,7 @@
         "repositoryURL": "https://github.com/suransea/MusicPlayer",
         "state": {
           "branch": "master",
-          "revision": "e0104d5bd1c07c5528f97f71b235da198958cbfc",
+          "revision": "9ad762d15d613fbdc9b312d6c910501c13618e62",
           "version": null
         }
       },
@@ -71,6 +71,15 @@
           "branch": null,
           "revision": "845455788ed18a7885eca3c00114372d6ba1aa4c",
           "version": "0.1.6"
+        }
+      },
+      {
+        "package": "Termbox",
+        "repositoryURL": "https://github.com/suransea/Termbox",
+        "state": {
+          "branch": "main",
+          "revision": "f5c59c66b18b1d63aa4842259406ebf1c1a17755",
+          "version": null
         }
       }
     ]
