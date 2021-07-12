@@ -91,9 +91,9 @@ class LyricTicker {
     }
     
     private func updateStatus(status: PlaybackState) {
+        onState?(status)
         if ignoreStatus { return }
         cancelScheduledTick()
-        onState?(status)
         if status.isPlaying { tick() }
     }
     
@@ -139,6 +139,7 @@ class LyricTicker {
             .collect(3)
             .first()
             .map { $0.sorted { $1.quality < $0.quality }.first }
+            .replaceError(with: nil)
             .eraseToAnyPublisher()
     }
 }

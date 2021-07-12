@@ -16,11 +16,29 @@ class LyricPlayer {
     init(player: MusicPlayerProtocol) {
         self.player = player
         self.ticker = LyricTicker(player: player)
-        ticker.onTrack = { [unowned self] in updateTrack(track: $0) }
-        ticker.onState = { [unowned self] in updateState(state: $0) }
-        ticker.onLyrics = { [unowned self] in updateLyrics(lyric: $0) }
-        ticker.onLine = { [unowned self] in updateLine(line: $0) }
-        ticker.onSeek = { [unowned self] _, _ in updateLine(line: ticker.current) }
+        ticker.onTrack = { [unowned self] in
+            updateTopBar(track: $0)
+            clearLyricArea()
+            updateBottomBar(lyric: nil)
+            Termbox.present()
+        }
+        ticker.onState = { [unowned self] _ in
+            updateBottomBar(lyric: lyric)
+            Termbox.present()
+        }
+        ticker.onLyrics = { [unowned self] in
+            updateLyricArea(current: ticker.current)
+            updateBottomBar(lyric: $0)
+            Termbox.present()
+        }
+        ticker.onLine = { [unowned self] in
+            updateLyricArea(current: $0)
+            Termbox.present()
+        }
+        ticker.onSeek = { [unowned self] _, _ in
+            updateLyricArea(current: ticker.current)
+            Termbox.present()
+        }
     }
     
     func start() {
@@ -33,55 +51,16 @@ class LyricPlayer {
     }
     
     func forceUpdate() {
-        updateTrack(track: player.currentTrack)
-        updateLyrics(lyric: lyric)
+        updateTopBar(track: player.currentTrack)
+        updateLyricArea(current: ticker.current)
+        updateBottomBar(lyric: lyric)
+        Termbox.present()
     }
     
     func reloadLyric() {
         updateBottomBar(state: player.playbackState, source: "Reloading...")
         Termbox.present()
         ticker.updateLyric()
-    }
-    
-    private func updateTrack(track: MusicTrack?) {
-        if let track = track {
-            updateTopBar(title: track.title ?? UNKNOWN, artist: track.artist, album: track.album)
-        } else {
-            updateTopBar(title: NO_CONTENT, artist: NO_CONTENT, album: NO_CONTENT)
-        }
-        clearLyricArea()
-        Termbox.present()
-    }
-    
-    private func updateState(state: PlaybackState) {
-        updateLyrics(lyric: lyric)
-    }
-    
-    private func updateLyrics(lyric: Lyrics?) {
-        self.lyric = lyric
-        let source: String
-        if let lyric = lyric {
-            source = lyric.metadata.service?.rawValue ?? UNKNOWN
-        } else {
-            source = NO_CONTENT
-        }
-        updateBottomBar(state: player.playbackState, source: source)
-        updateLine(line: ticker.current)
-        Termbox.present()
-    }
-    
-    private func updateLine(line: LyricsLine?) {
-        clearLyricArea()
-        let middle = Termbox.height / 2
-        if let line = line { printAt(x: SPACE, y: middle, text: line.content, foreground: .cyan) }
-        for (line, pos) in zip(ticker.past.reversed(), (SPACE..<middle).reversed()) {
-            printAt(x: SPACE, y: pos, text: line.content)
-        }
-        let peek = ticker.peek(Int(Termbox.height - middle))
-        for (line, pos) in zip(peek, middle + 1..<Termbox.height - SPACE) {
-            printAt(x: SPACE, y: pos, text: line.content)
-        }
-        Termbox.present()
     }
     
     private func clearTopBar() {
@@ -100,12 +79,31 @@ class LyricPlayer {
         }
     }
     
+    private func updateTopBar(track: MusicTrack?) {
+        if let track = track {
+            updateTopBar(title: track.title ?? UNKNOWN, artist: track.artist, album: track.album)
+        } else {
+            updateTopBar(title: NO_CONTENT, artist: NO_CONTENT, album: NO_CONTENT)
+        }
+    }
+    
     private func updateTopBar(title: String, artist: String?, album: String?) {
         clearTopBar()
         var bar = "Title: \(title)"
         if let artist = artist { bar += " | Artist: \(artist)" }
         if let album = album { bar += " | Album: \(album)" }
         printAt(x: SPACE, y: 0, text: bar, foreground: .black, background: .white)
+    }
+    
+    private func updateBottomBar(lyric: Lyrics?) {
+        self.lyric = lyric
+        let source: String
+        if let lyric = lyric {
+            source = lyric.metadata.service?.rawValue ?? UNKNOWN
+        } else {
+            source = NO_CONTENT
+        }
+        updateBottomBar(state: player.playbackState, source: source)
     }
     
     private func updateBottomBar(state: PlaybackState, source: String) {
@@ -120,6 +118,19 @@ class LyricPlayer {
         }()
         let bar = "State: \(status) | Lyric Source: \(source) | Press Q to quit, R to reload a lyric"
         printAt(x: SPACE, y: Termbox.height - 1, text: bar, foreground: .black, background: .white)
+    }
+    
+    private func updateLyricArea(current: LyricsLine?) {
+        clearLyricArea()
+        let middle = Termbox.height / 2
+        if let line = current { printAt(x: SPACE, y: middle, text: line.content, foreground: .cyan) }
+        for (line, pos) in zip(ticker.past.reversed(), (SPACE..<middle).reversed()) {
+            printAt(x: SPACE, y: pos, text: line.content)
+        }
+        let peek = ticker.peek(Int(Termbox.height - middle))
+        for (line, pos) in zip(peek, middle + 1..<Termbox.height - SPACE) {
+            printAt(x: SPACE, y: pos, text: line.content)
+        }
     }
 }
 
