@@ -123,7 +123,7 @@ class LyricPlayer {
     private func updateLyricArea(current: LyricsLine?) {
         clearLyricArea()
         let middle = Termbox.height / 2
-        if let line = current { printAt(x: SPACE, y: middle, text: line.content, foreground: .cyan) }
+        if let line = current { printAt(x: SPACE, y: middle, text: line.content, foreground: [.cyan, .bold]) }
         for (line, pos) in zip(ticker.past.reversed(), (SPACE..<middle).reversed()) {
             printAt(x: SPACE, y: pos, text: line.content)
         }
