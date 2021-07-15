@@ -4,8 +4,6 @@
 
 [LyricsX](https://github.com/ddddxxx/LyricsX) cross platform command line interface.
 
-This project is a proof of concept to demonstrate building [LyricsKit](https://github.com/ddddxxx/LyricsKit) on linux. No actual functionality is implemented yet.
-
 ## Dependences
 
 ### Linux
@@ -13,10 +11,6 @@ This project is a proof of concept to demonstrate building [LyricsKit](https://g
 [playerctl](https://github.com/altdesktop/playerctl)
 
 Can be installed by package manager.
-
-### macOS
-
-\-
 
 ## Usage
 
@@ -33,7 +27,7 @@ $ lyricsx-cli tick
 
 - Play
 ```
-$ lyricsx-cli play
+$ lyricsx-cli play [--color <color>] [--no-bold]
 ```
 
 ![play.png](https://i.loli.net/2021/07/12/4Zb36O5tANhoD8W.png)
