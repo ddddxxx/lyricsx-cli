@@ -9,10 +9,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
-        .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.9.1")),
-        .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.3.1")),
-        .package(url: "https://github.com/suransea/MusicPlayer", .branch("master")),
-        .package(url: "https://github.com/suransea/Termbox", .branch("main")),
+        .package(url: "https://github.com/ddddxxx/LyricsKit", .upToNextMinor(from: "0.11.1")),
+        .package(url: "https://github.com/cx-org/CXExtensions", .upToNextMinor(from: "0.4.0")),
+        .package(url: "https://github.com/ddddxxx/MusicPlayer", .upToNextMajor(from: "0.8.2")),
+        .package(url: "https://github.com/suransea/Termbox", .upToNextMajor(from: "1.0.2")),
     ],
     targets:  [
         .target(

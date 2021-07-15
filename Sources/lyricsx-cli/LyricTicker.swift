@@ -132,10 +132,8 @@ class LyricTicker {
     }
     
     private func lyricOf(title: String, artist: String, duration: TimeInterval) -> AnyPublisher<Lyrics?, Never> {
-        let req = LyricsSearchRequest(searchTerm: .info(title: title, artist: artist),
-                                      title: title, artist: artist, duration: duration)
-        return LyricsProviders.Group()
-            .lyricsPublisher(request: req)
+        LyricsProviders.Group()
+            .lyricsPublisher(request: LyricsSearchRequest(searchTerm: .info(title: title, artist: artist), duration: duration))
             .collect(3)
             .first()
             .map { $0.sorted { $1.quality < $0.quality }.first }

@@ -2,21 +2,30 @@
   "object": {
     "pins": [
       {
-        "package": "CombineX",
-        "repositoryURL": "https://github.com/cx-org/CombineX",
-        "state": {
-          "branch": null,
-          "revision": "96cd76ccddac5d0493ebd91d69f1e6e9ccb58f5f",
-          "version": "0.3.0"
-        }
-      },
-      {
         "package": "CXExtensions",
         "repositoryURL": "https://github.com/cx-org/CXExtensions",
         "state": {
           "branch": null,
-          "revision": "f0f7a28321f5261e2a5986e1a76b53bad60ed5aa",
-          "version": "0.3.1"
+          "revision": "4790ecd6a6c0e796d776a28a820b552f7e8f6abd",
+          "version": "0.4.0"
+        }
+      },
+      {
+        "package": "CXShim",
+        "repositoryURL": "https://github.com/cx-org/CXShim",
+        "state": {
+          "branch": null,
+          "revision": "82fecc246c7ca9f0ac1656b8199b7956e64d68f3",
+          "version": "0.4.0"
+        }
+      },
+      {
+        "package": "CXTest",
+        "repositoryURL": "https://github.com/cx-org/CXTest",
+        "state": {
+          "branch": null,
+          "revision": "929ce7cbd3005bc9356ae826bb65ee2611379b17",
+          "version": "0.4.0"
         }
       },
       {
@@ -33,17 +42,17 @@
         "repositoryURL": "https://github.com/ddddxxx/LyricsKit",
         "state": {
           "branch": null,
-          "revision": "031f30ddd85ef44e626a93a8736c6f7063fb64d1",
-          "version": "0.9.1"
+          "revision": "b42033695b59178dc785f264152633798e320594",
+          "version": "0.11.1"
         }
       },
       {
         "package": "MusicPlayer",
-        "repositoryURL": "https://github.com/suransea/MusicPlayer",
+        "repositoryURL": "https://github.com/ddddxxx/MusicPlayer",
         "state": {
-          "branch": "master",
-          "revision": "9ad762d15d613fbdc9b312d6c910501c13618e62",
-          "version": null
+          "branch": null,
+          "revision": "50904bac7aec79c5842f2ec3d1a1d858496dd6fe",
+          "version": "0.8.2"
         }
       },
       {
@@ -51,8 +60,8 @@
         "repositoryURL": "https://github.com/ddddxxx/Regex",
         "state": {
           "branch": null,
-          "revision": "739734521806e17a60ba8c439050ae7ada062551",
-          "version": "0.2.0"
+          "revision": "c0ad0a7e9a48989d9688c2b524a1e69b6293b733",
+          "version": "1.0.1"
         }
       },
       {
@@ -69,17 +78,17 @@
         "repositoryURL": "https://github.com/ddddxxx/SwiftCF",
         "state": {
           "branch": null,
-          "revision": "845455788ed18a7885eca3c00114372d6ba1aa4c",
-          "version": "0.1.6"
+          "revision": "72775c4b4dfceba8f6f43820d50f9286dc97160d",
+          "version": "0.2.1"
         }
       },
       {
         "package": "Termbox",
         "repositoryURL": "https://github.com/suransea/Termbox",
         "state": {
-          "branch": "main",
-          "revision": "f5c59c66b18b1d63aa4842259406ebf1c1a17755",
-          "version": null
+          "branch": null,
+          "revision": "2f84a1bb31b8af29df392eac8832d7d9377ea14f",
+          "version": "1.0.2"
         }
       }
     ]

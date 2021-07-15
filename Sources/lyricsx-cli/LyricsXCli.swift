@@ -21,7 +21,7 @@ struct LyricsSearch: ParsableCommand {
     
     func run() throws {
         let provider = LyricsProviders.Group()
-        let req = LyricsSearchRequest(searchTerm: .keyword(keyword), title: "", artist: "", duration: 0)
+        let req = LyricsSearchRequest(searchTerm: .keyword(keyword), duration: 0)
         guard let lrc = provider.lyricsPublisher(request: req).blocking().next() else {
             print("lyrics not found")
             return
@@ -39,7 +39,7 @@ typealias PlayingPlayer = MusicPlayers.MPRISNowPlaying
 struct LyricsTick: ParsableCommand {
     
     static var configuration = CommandConfiguration(commandName: "tick",
-                                                    abstract: "tick lyrics to stdout from the internet, with playing music")
+                                                    abstract: "tick lyrics to stdout with playing music")
     
     func run() throws {
         let ticker = LyricTicker(player: PlayingPlayer()!)
@@ -51,7 +51,7 @@ struct LyricsTick: ParsableCommand {
         ticker.onLyrics = { lyric in
             guard let lrc = lyric else { return }
             print("Matched:")
-            print("Source: \(lrc.metadata.service?.rawValue ?? "")\n")
+            print("Source: \(lrc.metadata.service?.rawValue ?? "Unknown")\n")
         }
         ticker.onSeek = { [unowned ticker] old, new in
             ticker.lines.prefix(new + 1).dropFirst(old < new && old > 0 ? old : 0).forEach { print($0.content) }
