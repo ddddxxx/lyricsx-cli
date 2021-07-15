@@ -10,12 +10,14 @@ class LyricPlayer {
     
     private let ticker: LyricTicker
     private let player: MusicPlayerProtocol
+    private let foreground: Attributes
     
     private var lyric: Lyrics?
     
-    init(player: MusicPlayerProtocol) {
+    init(player: MusicPlayerProtocol, foreground: Attributes) {
         self.player = player
         self.ticker = LyricTicker(player: player)
+        self.foreground = foreground
         ticker.onTrack = { [unowned self] in
             updateTopBar(track: $0)
             clearLyricArea()
@@ -123,7 +125,7 @@ class LyricPlayer {
     private func updateLyricArea(current: LyricsLine?) {
         clearLyricArea()
         let middle = Termbox.height / 2
-        if let line = current { printAt(x: SPACE, y: middle, text: line.content, foreground: [.cyan, .bold]) }
+        if let line = current { printAt(x: SPACE, y: middle, text: line.content, foreground: foreground) }
         for (line, pos) in zip(ticker.past.reversed(), (SPACE..<middle).reversed()) {
             printAt(x: SPACE, y: pos, text: line.content)
         }

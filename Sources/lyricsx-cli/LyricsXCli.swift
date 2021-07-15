@@ -71,10 +71,29 @@ struct LyricsTick: ParsableCommand {
 
 import Termbox
 
+extension Attributes: ExpressibleByArgument {
+    
+    static let attrs: [String: Attributes] = ["black": .black, "white": .white, "red": .red, "green": .green, "yellow": .yellow,
+                                              "blue": .blue, "magenta": .magenta, "cyan": .cyan]
+    
+    public init?(argument: String) {
+        guard let attr = Self.attrs[argument] else { return nil }
+        self = attr
+    }
+    
+    public var defaultValueDescription: String { "cyan" }
+    
+    public static var allValueStrings: [String] { Array(attrs.keys) }
+}
+
 struct LyricsPlay: ParsableCommand {
     
     static var configuration = CommandConfiguration(commandName: "play",
                                                     abstract: "play lyrics with playing music")
+    
+    @Option var color: Attributes = .cyan
+    
+    @Flag var noBold: Bool = false
     
     func run() throws {
         try Termbox.initialize()
@@ -85,7 +104,7 @@ struct LyricsPlay: ParsableCommand {
         }
         #endif
         
-        let player = LyricPlayer(player: PlayingPlayer()!)
+        let player = LyricPlayer(player: PlayingPlayer()!, foreground: noBold ? color : [.bold, color])
         player.start()
         loop: while true {
             guard let event = Termbox.pollEvent() else {
