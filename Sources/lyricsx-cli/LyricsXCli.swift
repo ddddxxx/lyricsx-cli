@@ -104,7 +104,8 @@ struct LyricsPlay: ParsableCommand {
         }
         #endif
         
-        let player = LyricPlayer(player: PlayingPlayer()!, foreground: noBold ? color : [.bold, color])
+        let playing = PlayingPlayer()!
+        let player = LyricPlayer(player: playing, foreground: noBold ? color : [.bold, color])
         player.start()
         loop: while true {
             guard let event = Termbox.pollEvent() else {
@@ -118,6 +119,15 @@ struct LyricsPlay: ParsableCommand {
                 break
             case .resize(width: _, height: _):
                 player.forceUpdate()
+                break
+            case .key(modifier: .none, value: .space):
+                playing.playPause()
+                break
+            case .character(modifier: .none, value: ","):
+                playing.skipToPreviousItem()
+                break
+            case .character(modifier: .none, value: "."):
+                playing.skipToNextItem()
                 break
             default:
                 break

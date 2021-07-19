@@ -94,7 +94,7 @@ class LyricTicker {
         onState?(status)
         if ignoreStatus { return }
         cancelScheduledTick()
-        if status.isPlaying { tick() }
+        tick()
     }
     
     private func cancelScheduledTick() {

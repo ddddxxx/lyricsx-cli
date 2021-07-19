@@ -30,4 +30,12 @@ $ lyricsx-cli tick
 $ lyricsx-cli play [--color <color>] [--no-bold]
 ```
 
+| KEY | ACTION |
+| --- | ------ |
+| Q | quit |
+| R | reload lyrics |
+| space | play or pause |
+| , | previous track |
+| . | next track |
+
 ![play.png](https://i.loli.net/2021/07/12/4Zb36O5tANhoD8W.png)

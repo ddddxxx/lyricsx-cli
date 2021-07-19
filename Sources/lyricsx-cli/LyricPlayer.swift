@@ -118,7 +118,7 @@ class LyricPlayer {
             default: return "Stopped"
             }
         }()
-        let bar = "State: \(status) | Lyric Source: \(source) | Press Q to quit, R to reload a lyric"
+        let bar = "State: \(status) | Lyric Source: \(source)"
         printAt(x: SPACE, y: Termbox.height - 1, text: bar, foreground: .black, background: .white)
     }
     
