@@ -14,7 +14,7 @@ let package = Package(
         .package(url: "https://github.com/ddddxxx/MusicPlayer", .upToNextMajor(from: "0.8.2")),
         .package(url: "https://github.com/suransea/Termbox", .upToNextMajor(from: "1.0.2")),
     ],
-    targets:  [
+    targets: [
         .target(
             name: "lyricsx-cli",
             dependencies: [
