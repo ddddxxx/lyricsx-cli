@@ -1,6 +1,6 @@
-import Foundation
-import Dispatch
 import CXShim
+import Dispatch
+import Foundation
 import LyricsService
 import MusicPlayer
 import Termbox
@@ -9,8 +9,11 @@ private let NO_CONTENT = "-"
 private let UNKNOWN = "Unknown"
 private let SPACE: Int32 = 2
 
-func printAt(x: Int32, y: Int32, text: String, foreground: Attributes = .default, background: Attributes = .default) {
-    for (c, xi) in zip(text.unicodeScalars, x ..< Termbox.width) {
+func printAt(
+    x: Int32, y: Int32, text: String, foreground: Attributes = .default,
+    background: Attributes = .default
+) {
+    for (c, xi) in zip(text.unicodeScalars, x..<Termbox.width) {
         Termbox.put(x: xi, y: y, character: c, foreground: foreground, background: background)
     }
 }
@@ -89,7 +92,7 @@ func updateLyricArea(lines: [LyricsLine], index: Int, foreground: Attributes) {
     }
 }
 
-func terminalEvents(on queue: DispatchQueue) -> AnyPublisher<Event, Never> {
+func terminalEvents(on queue: DispatchQueue) -> some Publisher<Event, Never> {
     let publisher = PassthroughSubject<Event, Never>()
     var active = true
     func publish() {
@@ -98,8 +101,9 @@ func terminalEvents(on queue: DispatchQueue) -> AnyPublisher<Event, Never> {
         }
         if active { queue.async { publish() } }
     }
-    return publisher.handleEvents(receiveSubscription: { _ in queue.async { publish() } },
-                                  receiveCancel: { active = false }).eraseToAnyPublisher()
+    return publisher.handleEvents(
+        receiveSubscription: { _ in queue.async { publish() } },
+        receiveCancel: { active = false })
 }
 
 func play(foreground: Attributes) {
@@ -109,14 +113,14 @@ func play(foreground: Attributes) {
     do { try Termbox.initialize() } catch {
         fatalError("\(error)")
     }
-    
+
     var cancelBag = [AnyCancellable]()
     let currentLyrics = CurrentValueSubject<Lyrics?, Never>(nil)
     var currentIndex = -1
-    
+
     currentLyrics
         .combineLatest(player.playbackStateWillChange.prepend(.stopped))
-        .map { lyrics, state -> AnyPublisher<Int, Never> in
+        .map { lyrics, state in
             updateBottomBar(state: state, lyric: lyrics)
             if let lyrics = lyrics {
                 currentIndex = index(of: state.time, of: lyrics.lines) - 1
@@ -124,6 +128,7 @@ func play(foreground: Attributes) {
                 if state.isPlaying {
                     Termbox.present()
                     return timedIndices(of: lyrics.lines, on: .main, with: player)
+                        .eraseToAnyPublisher()
                 }
             } else {
                 currentIndex = -1
@@ -140,7 +145,7 @@ func play(foreground: Attributes) {
             Termbox.present()
         }
         .store(in: &cancelBag)
-    
+
     player.currentTrackWillChange
         .prepend(nil)
         .handleEvents(receiveOutput: { track in
@@ -156,7 +161,7 @@ func play(foreground: Attributes) {
         }
         .sink { currentLyrics.send($0) }
         .store(in: &cancelBag)
-    
+
     let reloadLyrics = {
         guard let track = player.currentTrack else { return }
         updateBottomBar(state: player.playbackState, source: "Loading...")
@@ -169,7 +174,7 @@ func play(foreground: Attributes) {
             .sink { currentLyrics.send($0) }
             .store(in: &cancelBag)
     }
-    
+
     let forceUpdate = {
         updateTopBar(track: player.currentTrack)
         if let lyrics = currentLyrics.value {
@@ -180,7 +185,7 @@ func play(foreground: Attributes) {
         updateBottomBar(state: player.playbackState, lyric: currentLyrics.value)
         Termbox.present()
     }
-    
+
     terminalEvents(on: DispatchQueue(label: "TerminalEvents"))
         .receive(on: DispatchQueue.main.cx)
         .sink { event in
@@ -210,14 +215,14 @@ func play(foreground: Attributes) {
             }
         }
         .store(in: &cancelBag)
-    
+
     #if os(Linux)
-    Thread.detachNewThread {
-        Thread.current.name = "GMainLoop"
-        GRunLoop.main.run()
-    }
+        Thread.detachNewThread {
+            Thread.current.name = "GMainLoop"
+            GRunLoop.main.run()
+        }
     #endif
     RunLoop.main.run()
-    
+
     Termbox.shutdown()
 }

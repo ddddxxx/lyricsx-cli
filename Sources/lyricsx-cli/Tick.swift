@@ -1,30 +1,34 @@
-import Foundation
 import CXShim
+import Foundation
 import LyricsService
 import MusicPlayer
 
 #if os(macOS)
-typealias CurrentPlayer = MusicPlayers.SystemMedia
+    typealias CurrentPlayer = MusicPlayers.SystemMedia
 #elseif os(Linux)
-typealias CurrentPlayer = MusicPlayers.MPRISNowPlaying
+    typealias CurrentPlayer = MusicPlayers.MPRISNowPlaying
 #endif
 
-func lyrics(of track: MusicTrack) -> AnyPublisher<Lyrics, Never> {
+func lyrics(of track: MusicTrack) -> some Publisher<Lyrics, Never> {
     LyricsProviders.Group()
-        .lyricsPublisher(request: LyricsSearchRequest(searchTerm: .info(title: track.title ?? "", artist: track.artist ?? ""),
-                                                      duration: track.duration ?? 0))
+        .lyricsPublisher(
+            request: LyricsSearchRequest(
+                searchTerm: .info(title: track.title ?? "", artist: track.artist ?? ""),
+                duration: track.duration ?? 0)
+        )
         .prefix(3)
         .max { $0.quality < $1.quality }
         .ignoreError()
-        .eraseToAnyPublisher()
 }
 
 func index(of offset: TimeInterval, of lines: [LyricsLine]) -> Int {
     lines.firstIndex { $0.position > offset } ?? lines.count
 }
 
-func timedIndices(of lines: [LyricsLine], on queue: DispatchQueue,
-                  with player: MusicPlayerProtocol) -> AnyPublisher<Array<LyricsLine>.Index, Never> {
+func timedIndices(
+    of lines: [LyricsLine], on queue: DispatchQueue,
+    with player: MusicPlayerProtocol
+) -> some Publisher<Array<LyricsLine>.Index, Never> {
     let publisher = PassthroughSubject<Int, Never>()
     var canceled = false
     func publish(next index: Int) {
@@ -39,19 +43,20 @@ func timedIndices(of lines: [LyricsLine], on queue: DispatchQueue,
             publish(next: index + 1)
         }
     }
-    return publisher.handleEvents(receiveSubscription: { _ in
-        queue.async { publish(next: index(of: player.playbackTime, of: lines)) }
-    }, receiveCancel: { canceled = true }).eraseToAnyPublisher()
+    return publisher.handleEvents(
+        receiveSubscription: { _ in
+            queue.async { publish(next: index(of: player.playbackTime, of: lines)) }
+        }, receiveCancel: { canceled = true })
 }
 
 func tick() {
     guard let player = CurrentPlayer() else {
         fatalError("Unable to connect to the music player.")
     }
-    
+
     var cancelBag = [AnyCancellable]()
     var currentIndex = -1
-    
+
     player.currentTrackWillChange
         .prepend(nil)
         .handleEvents(receiveOutput: { track in
@@ -75,7 +80,7 @@ func tick() {
             }
         })
         .combineLatest(player.playbackStateWillChange.prepend(.stopped))
-        .map { lyrics, state -> AnyPublisher<(LyricsLine, index: Int), Never> in
+        .map { lyrics, state in
             if let lyrics = lyrics {
                 let index = index(of: state.time, of: lyrics.lines)
                 let dropCount = index < currentIndex ? 0 : 1 + currentIndex
@@ -95,12 +100,12 @@ func tick() {
             print(line.content)
         }
         .store(in: &cancelBag)
-    
+
     #if os(Linux)
-    Thread.detachNewThread {
-        Thread.current.name = "GMainLoop"
-        GRunLoop.main.run()
-    }
+        Thread.detachNewThread {
+            Thread.current.name = "GMainLoop"
+            GRunLoop.main.run()
+        }
     #endif
     RunLoop.main.run()
 }
