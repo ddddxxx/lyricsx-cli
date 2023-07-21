@@ -1,70 +1,95 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "CombineX",
-        "repositoryURL": "https://github.com/cx-org/CombineX",
-        "state": {
-          "branch": null,
-          "revision": "96cd76ccddac5d0493ebd91d69f1e6e9ccb58f5f",
-          "version": "0.3.0"
-        }
-      },
-      {
-        "package": "CXExtensions",
-        "repositoryURL": "https://github.com/cx-org/CXExtensions",
-        "state": {
-          "branch": null,
-          "revision": "6843af94bfaedfe90df1435c1a6c83cc3366a62b",
-          "version": "0.3.0"
-        }
-      },
-      {
-        "package": "Gzip",
-        "repositoryURL": "https://github.com/1024jp/GzipSwift",
-        "state": {
-          "branch": null,
-          "revision": "ba0b6cb51cc6202f896e469b87d2889a46b10d1b",
-          "version": "5.1.1"
-        }
-      },
-      {
-        "package": "LyricsKit",
-        "repositoryURL": "https://github.com/ddddxxx/LyricsKit",
-        "state": {
-          "branch": null,
-          "revision": "031f30ddd85ef44e626a93a8736c6f7063fb64d1",
-          "version": "0.9.1"
-        }
-      },
-      {
-        "package": "Regex",
-        "repositoryURL": "https://github.com/ddddxxx/Regex",
-        "state": {
-          "branch": null,
-          "revision": "739734521806e17a60ba8c439050ae7ada062551",
-          "version": "0.2.0"
-        }
-      },
-      {
-        "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser",
-        "state": {
-          "branch": null,
-          "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
-          "version": "0.3.2"
-        }
-      },
-      {
-        "package": "SwiftCF",
-        "repositoryURL": "https://github.com/ddddxxx/SwiftCF",
-        "state": {
-          "branch": null,
-          "revision": "845455788ed18a7885eca3c00114372d6ba1aa4c",
-          "version": "0.1.6"
-        }
+  "pins" : [
+    {
+      "identity" : "cxextensions",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cx-org/CXExtensions",
+      "state" : {
+        "revision" : "4790ecd6a6c0e796d776a28a820b552f7e8f6abd",
+        "version" : "0.4.0"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "cxshim",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cx-org/CXShim",
+      "state" : {
+        "revision" : "82fecc246c7ca9f0ac1656b8199b7956e64d68f3",
+        "version" : "0.4.0"
+      }
+    },
+    {
+      "identity" : "cxtest",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cx-org/CXTest",
+      "state" : {
+        "revision" : "929ce7cbd3005bc9356ae826bb65ee2611379b17",
+        "version" : "0.4.0"
+      }
+    },
+    {
+      "identity" : "gzipswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/1024jp/GzipSwift",
+      "state" : {
+        "revision" : "ba0b6cb51cc6202f896e469b87d2889a46b10d1b",
+        "version" : "5.1.1"
+      }
+    },
+    {
+      "identity" : "lyricskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ddddxxx/LyricsKit",
+      "state" : {
+        "revision" : "675a696588eaddf3e5661080c223102acdf8f404",
+        "version" : "0.11.3"
+      }
+    },
+    {
+      "identity" : "musicplayer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ddddxxx/MusicPlayer",
+      "state" : {
+        "revision" : "6eee88b4800bba1cc03b2a233fe858ccca7c9862",
+        "version" : "0.8.3"
+      }
+    },
+    {
+      "identity" : "regex",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ddddxxx/Regex",
+      "state" : {
+        "revision" : "c0ad0a7e9a48989d9688c2b524a1e69b6293b733",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
+        "version" : "1.2.2"
+      }
+    },
+    {
+      "identity" : "swiftcf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ddddxxx/SwiftCF",
+      "state" : {
+        "revision" : "72775c4b4dfceba8f6f43820d50f9286dc97160d",
+        "version" : "0.2.1"
+      }
+    },
+    {
+      "identity" : "termbox",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/suransea/Termbox",
+      "state" : {
+        "revision" : "2f84a1bb31b8af29df392eac8832d7d9377ea14f",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 2
 }
