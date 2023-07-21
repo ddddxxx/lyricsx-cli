@@ -6,36 +6,45 @@
 
 ## Dependences
 
+### macOS
+
+No additional dependencies required.
+
 ### Linux
 
-[playerctl](https://github.com/altdesktop/playerctl)
-
-Can be installed by package manager.
+- [playerctl](https://github.com/altdesktop/playerctl)
 
 ## Usage
 
+### Search
 
-- Search
 ```
 $ lyricsx-cli search <keyword>
 ```
 
-- Tick
+### Tick
+
 ```
 $ lyricsx-cli tick
 ```
 
-- Play
+### Play
+
 ```
 $ lyricsx-cli play [--color <color>] [--no-bold]
 ```
 
-| KEY | ACTION |
-| --- | ------ |
-| Q | quit |
-| R | reload lyrics |
-| space | play or pause |
-| , | previous track |
-| . | next track |
+#### Keyboard actions
 
-![play.png](https://i.loli.net/2021/07/12/4Zb36O5tANhoD8W.png)
+| KEY       | ACTION          |
+|-----------|-----------------|
+| `[Q]`     | *Q*uit          |
+| `[R]`     | *R*eload lyrics |
+| `[space]` | Play or pause   |
+| `[,]`     | Previous track  |
+| `[.]`     | Next track      |
+
+
+#### Snapshots
+
+![play.png](.assets/play.png)
